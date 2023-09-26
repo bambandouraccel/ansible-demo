@@ -1,0 +1,28 @@
+---
+- name: Apply httpd_webserver role
+  hosts: webservers
+  become: true
+  gather_facts: yes
+
+  roles:
+    - name: httpd_webserver
+
+- name: Apply balancer role
+  hosts: balancers
+  become: true
+  gather_facts: yes
+
+  roles:
+    - role: balancer
+  
+  post_tasks:
+    - name: Install firewall package
+      ansible.builtin.dnf:
+        name: firewalld
+        state: latest
+
+    - name: Start and enable firewall service
+      ansible.builtin.service:
+         name: firewalld
+         state: started
+         enabled: true
